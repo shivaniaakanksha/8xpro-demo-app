@@ -1,5 +1,3 @@
-import 'package:demo8xpro/home_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PhoneAuth extends StatefulWidget {
@@ -9,86 +7,6 @@ class PhoneAuth extends StatefulWidget {
 
 class _PhoneAuthState extends State<PhoneAuth> {
   final _phoneController = TextEditingController();
-  final _codeController = TextEditingController();
-
-  Future<bool> loginUser(String phone, BuildContext context) async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-
-    _auth.verifyPhoneNumber(
-        phoneNumber: phone,
-        timeout: Duration(seconds: 60),
-        verificationCompleted: (AuthCredential credential) async {
-          Navigator.of(context).pop();
-
-          AuthResult result = await _auth.signInWithCredential(credential);
-
-          FirebaseUser user = result.user;
-
-          if (user != null) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HomePage(
-                          user: user,
-                        )));
-          } else {
-            print("Error");
-          }
-
-          //This callback would gets called when verification is done auto maticlly
-        },
-        verificationFailed: (AuthException exception) {
-          print(exception);
-        },
-        codeSent: (String verificationId, [int forceResendingToken]) {
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text("Give the code?"),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextField(
-                        controller: _codeController,
-                      ),
-                    ],
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("Confirm"),
-                      textColor: Colors.white,
-                      color: Colors.blue,
-                      onPressed: () async {
-                        final code = _codeController.text.trim();
-                        AuthCredential credential =
-                            PhoneAuthProvider.getCredential(
-                                verificationId: verificationId, smsCode: code);
-
-                        AuthResult result =
-                            await _auth.signInWithCredential(credential);
-
-                        FirebaseUser user = result.user;
-
-                        if (user != null) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                        user: user,
-                                      )));
-                        } else {
-                          print("Error");
-                        }
-                      },
-                    )
-                  ],
-                );
-              });
-        },
-        codeAutoRetrievalTimeout: null);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +42,9 @@ class _PhoneAuthState extends State<PhoneAuth> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // SizedBox(
+                //   height: 30,
+                // ),
                 Container(
                   padding: EdgeInsets.all(20),
                   width: double.infinity,
@@ -162,34 +83,6 @@ class _PhoneAuthState extends State<PhoneAuth> {
                         hintText: "Mobile Number"),
                     controller: _phoneController,
                   ),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  //width: MediaQuery.of(context).size.width * 0.75,
-                  child: RaisedButton(
-                      color: Colors.blue,
-                      textColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 48),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
-                      child: Text(
-                        "Next",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      onPressed: () {}
-                      //  => Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) {
-                      //       return PhoneAuth();
-                      //     },
-                      //   ),
-                      // ),
-                      ),
                 ),
               ],
             )
